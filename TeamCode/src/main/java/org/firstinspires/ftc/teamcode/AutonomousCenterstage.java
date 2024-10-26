@@ -39,32 +39,22 @@ public class AutonomousCenterstage extends LinearOpMode {
     {
         RobotHardware.StartHardware(hardwareMap);
 
-        CenterstageDriveTrain = new Drivetrain(imu, lfront, lback, rfront, rback, lfront, lback, rfront, 1,1,1,1,1); // TODO add odometry pod stuf
-        Arm = new Lift(armMotor, Lift.LiftType.SinlejointedArm, 100, 32, 0, 0.00755190904, false, 1, ArmLimit);
-        Slider = new Lift(SliderMotor, Lift.LiftType.LinearSlides, 100, 32, 1, 0, true, 1, ArmLimit);
-
-
+        CenterstageDriveTrain = new Drivetrain(imu, lfront, lback, rfront, rback); // TODO add odometry pod stuf
 
         telemetry.addData("Status: ", "Calibrating...");
 
-
         CenterstageDriveTrain.Init();
-        Arm.Init();
         telemetry.update();
 
         try {
             File startPosFile = new File("org\\firstinspires\\ftc\\teamcode\\classes\\extra\\datafiles\\StartingPosition.txt");
             BufferedReader fileReader = new BufferedReader(new FileReader(startPosFile));
             StartPosString = fileReader.readLine();
-
-
         }
         catch (IOException e)
         {
             telemetry.addData("Error: ", e);
         }
-
-
         telemetry.addData("Status: ", "Selecting start pos...");
         telemetry.addData("StartPos: ", StartPosString);
         telemetry.update();
@@ -97,7 +87,6 @@ public class AutonomousCenterstage extends LinearOpMode {
         waitForStart();
         // Code after start is pressed------------------------------------------------------------------------------------
 
-
             while(!isStopRequested()) {
 
 
@@ -105,13 +94,6 @@ public class AutonomousCenterstage extends LinearOpMode {
 
                 //if( positie, 1, 2 of 3; rijd naar de juiste plek
             }
-
-
-
-
-
-
-
     }
 
 }
