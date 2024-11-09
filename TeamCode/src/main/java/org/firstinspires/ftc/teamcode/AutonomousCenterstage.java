@@ -5,17 +5,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.classes.Drivetrain;
-import org.firstinspires.ftc.teamcode.classes.Hardware;
-import org.firstinspires.ftc.teamcode.classes.Lift;
-import org.firstinspires.ftc.teamcode.classes.extra.GethPath;
-import org.firstinspires.ftc.teamcode.classes.extra.Position;
+import org.firstinspires.ftc.teamcode.classes.structureComponents.Drivetrain;
+import org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware;
+import org.firstinspires.ftc.teamcode.classes.structureComponents.Lift;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import static org.firstinspires.ftc.teamcode.classes.Hardware.*;
+import static org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware.*;
 import static org.firstinspires.ftc.teamcode.classes.extra.StartingPositions.*;
 
 @Autonomous(name = "Autonomous :)", group = "Centerstage")
