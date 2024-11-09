@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode.classes;
+package org.firstinspires.ftc.teamcode.classes.structureComponents;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class Arm extends Robot{
+import org.firstinspires.ftc.teamcode.classes.Robot;
+
+public class Arm extends Robot {
    // hardware and variables
     public Servo ArmServ;
     float FrontBound, RearBound;

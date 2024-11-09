@@ -1,15 +1,15 @@
 // This is a class for demonstrations
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.demo;
 
 
 
-import static org.firstinspires.ftc.teamcode.classes.Hardware.*;
+import static org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware.*;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.classes.Hardware;
+import org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware;
 
 @Disabled
 public class DemoClass {

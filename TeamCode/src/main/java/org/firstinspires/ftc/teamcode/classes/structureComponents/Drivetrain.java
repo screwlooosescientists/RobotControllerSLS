@@ -1,19 +1,16 @@
-package org.firstinspires.ftc.teamcode.classes;
+package org.firstinspires.ftc.teamcode.classes.structureComponents;
 
 // imports
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.extra.Node;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.classes.extra.PID;
 
-import static org.firstinspires.ftc.teamcode.classes.Hardware.*;
-
-public class Drivetrain extends Robot  {
+public class Drivetrain extends Robot {
 
     // Properties of drivetrain
     public DcMotor Lfront, Lback, Rfront, Rback;    //the drive motors
@@ -36,8 +33,8 @@ public class Drivetrain extends Robot  {
 
     public float  odometryDiameter, verticalEncoderOfset, horizontalEncoderOfset; // for odometry
 
-    public PID drivePIDX = new PID(0, 0, 0, 0, timer.time());
-    public PID drivePIDY = new PID(0, 0, 0, 0, timer.time());
+    public PID drivePIDX = new PID(1, 0, 0, 0, timer.time());
+    public PID drivePIDY = new PID(1, 0, 0, 0, timer.time());
     public PID drivePIDAngle = new PID(0, 0, 0, 0, timer.time());
 
 
@@ -105,8 +102,8 @@ public class Drivetrain extends Robot  {
        double y = drivePIDY.pidValue(RobotPositionY, Target.Y, timer.time());
        double angle = drivePIDAngle.pidValue(RobotHeading, Target.TargetHeading, timer.time());
 
-        double deltaX = RobotPositionX - Target.X;
-        double deltaY = RobotPositionY - Target.Y;
+       double deltaX = RobotPositionX - Target.X;
+       double deltaY = RobotPositionY - Target.Y;
 
         distance = (float)Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
@@ -123,6 +120,7 @@ public class Drivetrain extends Robot  {
         Lback.setPower(backLeftPower / denominator);
         Rfront.setPower(frontRightPower / denominator);
         Rback.setPower(backRightPower / denominator);
+
 
 
         /*

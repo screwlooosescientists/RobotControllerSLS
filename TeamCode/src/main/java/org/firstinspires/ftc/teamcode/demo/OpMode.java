@@ -1,17 +1,14 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.demo;
 
-import static org.firstinspires.ftc.teamcode.DemoClass.DriveForward;
-import static org.firstinspires.ftc.teamcode.DemoClass.Strave;
-import static org.firstinspires.ftc.teamcode.DemoClass.Turn;
-import static org.firstinspires.ftc.teamcode.DemoClass.initHardware;
+import static org.firstinspires.ftc.teamcode.demo.DemoClass.DriveForward;
+import static org.firstinspires.ftc.teamcode.demo.DemoClass.Strave;
+import static org.firstinspires.ftc.teamcode.demo.DemoClass.initHardware;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-@Autonomous(group = "Demo", name = "Autonomous")
+@Disabled
 public class OpMode extends LinearOpMode {
-
 
     @Override
     public void runOpMode() {
@@ -36,11 +33,5 @@ public class OpMode extends LinearOpMode {
        Strave(0.2, -60);
        DriveForward(0.2,70);
        Strave(0.2,60);
-
-
-
-
-
-
     }
 }

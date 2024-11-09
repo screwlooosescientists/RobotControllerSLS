@@ -1,11 +1,13 @@
-package org.firstinspires.ftc.teamcode.classes;
+package org.firstinspires.ftc.teamcode.classes.structureComponents;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.teamcode.classes.Robot;
 
-public class Lift extends Robot{
+
+public class Lift extends Robot {
     // hardware
     DcMotor liftMotor;
     TouchSensor LiftLimit;
