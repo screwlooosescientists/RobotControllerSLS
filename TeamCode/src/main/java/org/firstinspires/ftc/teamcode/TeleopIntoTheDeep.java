@@ -14,87 +14,80 @@ import org.firstinspires.ftc.teamcode.classes.extra.Node;
 
 import static org.firstinspires.ftc.teamcode.classes.robotHardware.RobotObject.*;
 import static org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware.*;
-//import org.firstinspires.ftc.teamcode.classes.extra.mqtt.MqttBroker;
 
+
+/**
+ * TeleOp mode for the "Into The Deep" robot.
+ * This class controls the robot's movement, arm, and other functionalities during the driver-controlled period.
+ */
 @TeleOp(name = "TeleOp Test", group = "IntoTheDeep")
 public class TeleopIntoTheDeep extends LinearOpMode {
 
-    /*
-    Hardware RobotHardware = new Hardware();
-    public Drivetrain IntoDeepDriveTrain;
-    public Intake Klauw;
-    public Odometry odo;
+    /**
+     * Timer for tracking the elapsed time during the OpMode.
      */
     public ElapsedTime Runtime = new ElapsedTime();
 
+    /**
+     * Variables to store the gamepad inputs for driving.
+     */
     float x1, y1, x2;
 
-    int ArmPoss = 0;
-    PID ArmPID = new PID(1, 0, 0, 0, 0);
-
-    // todo: write your code here
+    /**
+     * Main method for the TeleOp mode.
+     * Initializes the robot, waits for the start command, and then enters the main control loop.
+     */
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() {
+        // Initialize the robot's hardware.
         RobotObject.init(hardwareMap);
         telemetry.addData("status", "waiting for start");
         telemetry.update();
 
+        // Initialize the drivetrain.
         IntoDeepDriveTrain.Init();
 
+        // Wait for the start command.
         waitForStart();
         Runtime.reset();
-        while(opModeIsActive())
-        {
-            x1 = gamepad1.left_stick_x;
+
+        // Main control loop.
+        while (opModeIsActive()) {
+            // Get gamepad inputs.
+            x1= gamepad1.left_stick_x;
             y1 = gamepad1.left_stick_y;
             x2 = gamepad1.right_stick_x;
 
-            //Sets the robot pose to the pose from the Odometry thread
+            // Sets the robot pose to the pose from the Odometry thread
             IntoDeepDriveTrain.setRobotPose(odo.RobotPositionX, odo.RobotPositionY, odo.RobotOrientation);
 
-//Drive to point test----------------------------------------------------------------------------------------
-            if (gamepad1.dpad_left)
-            {
+            //Drive to point test----------------------------------------------------------------------------------------
+            // If dpad left is pressed, drive to a specific point.
+            if (gamepad1.dpad_left) {
                 IntoDeepDriveTrain.DriveToPoint(new Node(10, 0, 0, false, 0));
                 telemetry.addData("driving to pointX: ", 10);
             }
-            else if(gamepad1.right_trigger> 0.3)
-                IntoDeepDriveTrain.DriveFieldCenter(x1/3, y1/3, -x2/3);
-            else
-            {
+            // If right trigger is pressed, drive in field-centric mode at reduced speed.
+            else if (gamepad1.right_trigger > 0.3)
+                IntoDeepDriveTrain.DriveFieldCenter(x1 / 3, y1 / 3, -x2 / 3);
+                // Otherwise, drive in field-centric mode at normal speed.
+            else {
                 IntoDeepDriveTrain.DriveFieldCenter(x1, y1, x2);
             }
 
-
+            // Control the lift using the left stick of gamepad 2.
             lift.setPower(gamepad2.left_stick_y);
+            // Control the horizontal slider using the right stick of gamepad 2.
             horizontalSlider.MoveArm(gamepad2.right_stick_y, 1, 0);
 
-//            if(gamepad2.left_trigger - gamepad2.right_trigger != 0)
-//            {
-//                ArmPoss = armTestMotor.getCurrentPosition();
-//                armTestMotor.setPower(gamepad2.left_trigger - gamepad2.right_trigger);
-//            }
-//            else
-//            {
-//                armTestMotor.setPower(ArmPID.pidValue(armTestMotor.getCurrentPosition(), ArmPoss, 0));
-//            }
-//
-
-
-
-    //Test telemetry----------------------------------------------------------------------------
-
+            //Test telemetry----------------------------------------------------------------------------
+            // Display the robot's position, odometry loop time, and orientation.
             telemetry.addData("Position: ", IntoDeepDriveTrain.RobotPositionX + ", " + IntoDeepDriveTrain.RobotPositionY);
             telemetry.addData("Odo LoopTime: ", odo.millis);
             telemetry.addData("IMU Orientation", Math.toDegrees(IntoDeepDriveTrain.GetIMURobotHeading()));
             telemetry.addData("ODO Orientation", Math.toDegrees(IntoDeepDriveTrain.RobotHeading));
-    //Telemetry---------------------------------------------------------------------------------
-            telemetry.addData("status", "running" );
+            //Telemetry---------------------------------------------------------------------------------
+            telemetry.addData("status", "running");
             telemetry.update();
-        }
-    }
+        }}
 }
-
-
-
