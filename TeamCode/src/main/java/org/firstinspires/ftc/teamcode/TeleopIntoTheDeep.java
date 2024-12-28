@@ -3,19 +3,18 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.classes.extra.PID;
 import org.firstinspires.ftc.teamcode.classes.robotHardware.RobotObject;
-import org.firstinspires.ftc.teamcode.classes.structureComponents.Drivetrain;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware;
-import org.firstinspires.ftc.teamcode.classes.structureComponents.Intake;
-import org.firstinspires.ftc.teamcode.classes.structureComponents.Odometry;
 import org.firstinspires.ftc.teamcode.classes.extra.Node;
 
 import static org.firstinspires.ftc.teamcode.classes.robotHardware.RobotObject.*;
-
 import static org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware.*;
+//import org.firstinspires.ftc.teamcode.classes.extra.mqtt.MqttBroker;
 
 @TeleOp(name = "TeleOp Test", group = "IntoTheDeep")
 public class TeleopIntoTheDeep extends LinearOpMode {
@@ -30,28 +29,14 @@ public class TeleopIntoTheDeep extends LinearOpMode {
 
     float x1, y1, x2;
 
-    boolean state = false;
+    int ArmPoss = 0;
+    PID ArmPID = new PID(1, 0, 0, 0, 0);
 
     // todo: write your code here
     @Override
     public void runOpMode()
     {
         RobotObject.init(hardwareMap);
-
-        /*
-        // hardware map reference
-        RobotHardware.StartHardware(hardwareMap);
-
-
-        IntoDeepDriveTrain = new Drivetrain(imu, lfront, lback, rfront, rback);
-        Klauw = new Intake(klauwServoLinks, klauwServoRechts);
-        //TODO get the right values to put into the constructor
-        odo = new Odometry(lback, rfront, lfront, 21.5, 1, 6.15, 1, 4096);
-
-
-
-         */
-
         telemetry.addData("status", "waiting for start");
         telemetry.update();
 
@@ -75,29 +60,37 @@ public class TeleopIntoTheDeep extends LinearOpMode {
                 telemetry.addData("driving to pointX: ", 10);
             }
             else if(gamepad1.right_trigger> 0.3)
-                IntoDeepDriveTrain.DriveRobotCenter(x1/3, y1/3, -x2/3);
+                IntoDeepDriveTrain.DriveFieldCenter(x1/3, y1/3, -x2/3);
             else
             {
-                IntoDeepDriveTrain.DriveRobotCenter(x1, y1, x2);
+                IntoDeepDriveTrain.DriveFieldCenter(x1, y1, x2);
             }
 
-  //Test telemetry----------------------------------------------------------------------------
-            //CenterstageDriveTrain.getPosition();
 
-            if(gamepad1.triangle) {
-                Klauw.KlauwOpen();
-            }
-            else if(gamepad1.circle)
-            {
-                Klauw.KlauwDicht();
-            }
+            lift.setPower(gamepad2.left_stick_y);
+            horizontalSlider.MoveArm(gamepad2.right_stick_y, 1, 0);
 
- //Telemetry---------------------------------------------------------------------------------
-            telemetry.addData("status", "running" );
+//            if(gamepad2.left_trigger - gamepad2.right_trigger != 0)
+//            {
+//                ArmPoss = armTestMotor.getCurrentPosition();
+//                armTestMotor.setPower(gamepad2.left_trigger - gamepad2.right_trigger);
+//            }
+//            else
+//            {
+//                armTestMotor.setPower(ArmPID.pidValue(armTestMotor.getCurrentPosition(), ArmPoss, 0));
+//            }
+//
+
+
+
+    //Test telemetry----------------------------------------------------------------------------
+
             telemetry.addData("Position: ", IntoDeepDriveTrain.RobotPositionX + ", " + IntoDeepDriveTrain.RobotPositionY);
             telemetry.addData("Odo LoopTime: ", odo.millis);
-            telemetry.addData("Orientation", (IntoDeepDriveTrain.RobotHeading / Math.PI * 180));
-            //telemetry.addData("Orientation acording to imu", imu.)
+            telemetry.addData("IMU Orientation", Math.toDegrees(IntoDeepDriveTrain.GetIMURobotHeading()));
+            telemetry.addData("ODO Orientation", Math.toDegrees(IntoDeepDriveTrain.RobotHeading));
+    //Telemetry---------------------------------------------------------------------------------
+            telemetry.addData("status", "running" );
             telemetry.update();
         }
     }

@@ -10,15 +10,18 @@ public class Hardware {
 
     private static HardwareMap hwmap = null;
     // create motors
-
     public static DcMotor lfront;
     public static DcMotor rfront;
     public static DcMotor lback;
     public static DcMotor rback;
 
+    public static DcMotor lift;
+
     //create servos
     public static Servo klauwServoLinks;
     public static Servo klauwServoRechts;
+
+    public static Servo HorizontalSlider;
 
     // create sensors
     public static IMU imu;
@@ -40,11 +43,15 @@ public class Hardware {
         lback = hwmap.get(DcMotor.class, "Lback"); //also the x1 encoder for odometry
         rback = hwmap.get(DcMotor.class, "Rback");
 
+        lift = hwmap.get(DcMotor.class, "Lift");
+
         // connect servos
         klauwServoLinks = hwmap.get(Servo.class, "KlauwServoLinks"); //expansionhub port 0
         klauwServoRechts = hwmap.get(Servo.class, "KlauwServoRechts" ); //expansionhub port 1
+        HorizontalSlider = hwmap.get(Servo.class, "HorizontalSlider");
+
         //connect sensors
-        X1 = new Encoder(lback, Encoder.Direction.FORWARD);
+        X1 = new Encoder(lback, Encoder.Direction.REVERSE);
         X2 = new Encoder(rfront, Encoder.Direction.FORWARD);
         Y = new Encoder(lfront, Encoder.Direction.FORWARD);
 
