@@ -5,11 +5,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.classes.Robot;
 import org.firstinspires.ftc.teamcode.classes.extra.Node;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.classes.extra.PID;
 
+/**
+ * The Drivetrain class represents the robot's drivetrain system, responsible for movement and orientation.
+ * It provides methods for controlling the robot's motion, including driving in robot-centric and field-centric modes,
+ * as well as navigatingto specific points.
+ *
+ * <p>This class extends the {@link Robot} class, inheriting its basic functionalities.</p>
+ */
 public class Drivetrain extends Robot {
 
     // Properties of drivetrain
@@ -40,9 +48,17 @@ public class Drivetrain extends Robot {
 
     // variables for robot orientation
       public double RobotPositionX, RobotPositionY;
-      public double RobotHeading;
+      public double RobotHeading, ImuRobotHeading;
 
-    // constructor
+    /**
+     * Constructor for the Drivetrain class.
+     *
+     * @param imu    The IMU instance for orientation sensing.
+     * @param Lfront The front left drive motor.
+     * @param Lback  The back left drive motor.
+     * @param Rfront The front right drive motor.
+     * @param Rback  The back right drive motor.
+     */
     public  Drivetrain(IMU imu, DcMotor Lfront, DcMotor Lback, DcMotor Rfront, DcMotor Rback){
         this.Lfront = Lfront;
         this.Lback = Lback;
@@ -51,6 +67,13 @@ public class Drivetrain extends Robot {
         this.imu = imu;
     }
 
+    /**
+     * Sets the robot's current pose (position and heading).
+     *
+     * @param posX    The robot's X position.
+     * @param posY    The robot's Y position.
+     * @param Heading The robot's heading (orientation).
+     */
     public void setRobotPose(double posX, double posY, double Heading)
     {
         this.RobotPositionX = posX;
@@ -58,14 +81,30 @@ public class Drivetrain extends Robot {
         this.RobotHeading = Heading;
     }
 
-    //function for robot oriented drive
-    public void DriveRobotCenter(float X1, float Y1, float X2 )
+    /**
+     * Gets the robot's current heading as measured by the IMU.
+     *
+     * @return The robot's heading in radians.
+     */
+    public double GetIMURobotHeading()
+    {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+    }
+
+    /**
+     * Drives the robot in a robot-centric manner.
+     *
+     * @param X1 The desired X-axis movement (-1 to 1).
+     * @param Y1 The desired Y-axis movement (-1 to 1).
+     * @param X2 The desired rotational movement (-1 to 1).
+     */
+    public void DriveRobotCenter(double X1, double Y1, double X2 )
     {
         double denominator = Math.max(Math.abs(X1) + Math.abs(Y1) + Math.abs(X2), 1);
-        double frontLeftPower = (-Y1 + X1 + X2) / denominator;
-        double backLeftPower = (-Y1 - X1 + X2) / denominator;
-        double frontRightPower = (-Y1 - X1 - X2) / denominator;
-        double backRightPower = (-Y1 + X1 - X2) / denominator;
+        double frontLeftPower = (Y1 - X1 - X2) / denominator;
+        double backLeftPower = (Y1 + X1 - X2) / denominator;
+        double frontRightPower = (Y1 + X1 + X2) / denominator;
+        double backRightPower = (Y1 - X1 + X2) / denominator;
 
         Lfront.setPower(frontLeftPower);
         Lback.setPower(backLeftPower);
@@ -73,27 +112,27 @@ public class Drivetrain extends Robot {
         Rback.setPower(backRightPower);
     }
 
+    /**
+     * Drives the robot in a field-centric manner.
+     *
+     * @param X1 The desired X-axis movement (-1 to 1).
+     * @param Y1 The desired Y-axis movement (-1 to 1).
+     * @param X2 The desired rotational movement (-1 to 1).
+     */
     public void DriveFieldCenter(float X1, float Y1, float X2)
     {
-        double heading = RobotHeading;
+        double heading = GetIMURobotHeading();
         double rotX = X1 * Math.cos(heading) - Y1 * Math.sin(heading);
         double rotY = X1 * Math.sin(heading) + Y1 * Math.cos(heading);
 
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio, but only when
-        // at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(Y1) + Math.abs(X1) + Math.abs(X2), 1);
-        double frontLeftPower = (-rotY + rotX + X2) / denominator;
-        double backLeftPower = (-rotY - rotX + X2) / denominator;
-        double frontRightPower = (-rotY - rotX - X2) / denominator;
-        double backRightPower = (-rotY + rotX - X2) / denominator;
-
-        Lfront.setPower(frontLeftPower);
-        Lback.setPower(backLeftPower);
-        Rfront.setPower(frontRightPower);
-        Rback.setPower(backRightPower);
+        DriveRobotCenter(rotX, rotY, X2);
     }
 
+    /**
+     * Drives the robot to a specific point in the field.
+     *
+     * @param Target The target point to drive to, represented as a {@link Node}.
+     */
     public void DriveToPoint(Node Target)
     {   // get data needed for calculations
 
@@ -194,8 +233,6 @@ public class Drivetrain extends Robot {
 
     @Override
     public void Init() { //TODO make a init function, robot calib etc
-
       imu.resetYaw();
-
     }
 }
