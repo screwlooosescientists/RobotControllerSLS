@@ -121,7 +121,7 @@ public class Drivetrain extends Robot {
      */
     public void DriveFieldCenter(float X1, float Y1, float X2)
     {
-        double heading = GetIMURobotHeading();
+        double heading = -RobotHeading;
         double rotX = X1 * Math.cos(heading) - Y1 * Math.sin(heading);
         double rotY = X1 * Math.sin(heading) + Y1 * Math.cos(heading);
 
