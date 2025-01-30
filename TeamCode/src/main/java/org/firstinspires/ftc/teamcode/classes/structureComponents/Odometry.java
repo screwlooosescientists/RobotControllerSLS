@@ -204,7 +204,7 @@ public class Odometry implements Runnable {
                 // looping code here
                 long start = System.currentTimeMillis();
                 getPosition();
-                Thread.sleep(10); //sleeps thread to save cpu usage adjust for faster loop time
+                Thread.sleep(1); //sleeps thread to save cpu usage adjust for faster loop time
                 long finish = System.currentTimeMillis();
                 millis = finish - start;
             }

@@ -31,6 +31,12 @@ public class RobotObject {
      * The Arm instance for controlling the horizontal slider mechanism.
      */
     public static Arm horizontalSlider;
+
+    /**
+     * The Arm instance for controlling the draai arm.
+     */
+    public static Arm draaiArm;
+
     /**
      * The Intake instance for controlling the claw mechanism.
      */
@@ -50,10 +56,12 @@ public class RobotObject {
 
         RobotHardware.StartHardware(hardwareMap);
         IntoDeepDriveTrain = new Drivetrain(imu, lfront, lback, rfront, rback);
-        Klauw = new Intake(klauwServoLinks, klauwServoRechts);horizontalSlider = new Arm(HorizontalSlider, 1, 0);
-
+        Klauw = new Intake(klauwServoLinks, klauwServoRechts);
+        horizontalSlider = new Arm(HorizontalSlider, 1, 0);
+        draaiArm = new Arm(Arm, 1, 0);
+        Klauw.Init();
         //TODO get the right values to put into the constructor(diam = 60 mm)
-        odo = new Odometry(X1, X2, Y, 21.5, 1, 6, 1, 8192);
+        odo = new Odometry(X1, X2, Y, 19.55, 1, 6, 1, 8192);
         return true;
     }
 }

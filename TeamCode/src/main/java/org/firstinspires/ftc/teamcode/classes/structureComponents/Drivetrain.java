@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.classes.structureComponents;
 
 // imports
+import static org.firstinspires.ftc.teamcode.classes.robotHardware.RobotObject.odo;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -34,16 +36,17 @@ public class Drivetrain extends Robot {
 
     //robot pose vars
     float lastDistance;
-    float distance;
+    public float distance = 1000;
+    public double angle;
     public double prevOrient;
 
     public float wheelDiameter, GearRatio; // for the driven wheels
 
     public float  odometryDiameter, verticalEncoderOfset, horizontalEncoderOfset; // for odometry
 
-    public PID drivePIDX = new PID(1, 0, 0, 0, timer.time());
-    public PID drivePIDY = new PID(1, 0, 0, 0, timer.time());
-    public PID drivePIDAngle = new PID(0, 0, 0, 0, timer.time());
+    public PID drivePIDX = new PID(0.05, 0.01, 0.01);
+    public PID drivePIDY = new PID(0.05, 0.01, 0.01);
+    public PID drivePIDAngle = new PID(3, 0.012, 0.01);
 
 
     // variables for robot orientation
@@ -133,90 +136,48 @@ public class Drivetrain extends Robot {
      *
      * @param Target The target point to drive to, represented as a {@link Node}.
      */
-    public void DriveToPoint(Node Target)
-    {   // get data needed for calculations
+    public void DriveToPoint(Node Target) {
+        // Get elapsed time for PID calculations
+        double currentTime = timer.seconds();
+        setRobotPose(odo.RobotPositionX, odo.RobotPositionY, odo.RobotOrientation);
+        // Calculate PID outputs for X, Y, and Angle
+        double x = drivePIDX.calculate(RobotPositionX, Target.X, timer);
+        double y = drivePIDY.calculate(RobotPositionY, Target.Y, timer);
+        angle = drivePIDAngle.calculate(RobotHeading, Target.TargetHeading, timer);
 
+        // Calculate distance to the target point
+        double deltaX = Target.X - RobotPositionX;
+        double deltaY = Target.Y - RobotPositionY;
+        distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-       double x = drivePIDX.pidValue(RobotPositionX, Target.X, timer.time());
-       double y = drivePIDY.pidValue(RobotPositionY, Target.Y, timer.time());
-       double angle = drivePIDAngle.pidValue(RobotHeading, Target.TargetHeading, timer.time());
+        // Transform field-relative values to robot-relative
+        double xRot = (x * Math.cos(-RobotHeading) - y * Math.sin(-RobotHeading));
+        double yRot = (x * Math.sin(-RobotHeading) + y * Math.cos(-RobotHeading));
 
-       double deltaX = RobotPositionX - Target.X;
-       double deltaY = RobotPositionY - Target.Y;
+        // Calculate motor powers
+        double frontLeftPower = (-xRot - yRot - angle);
+        double backLeftPower = (-xRot + yRot - angle);
+        double frontRightPower = (-xRot + yRot + angle);
+        double backRightPower = (-xRot - yRot + angle);
 
-        distance = (float)Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        // Normalize motor powers
+        double denominator = Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(backLeftPower),
+                Math.max(Math.abs(frontRightPower), Math.abs(backRightPower))));
+        denominator = Math.max(denominator, 1);
 
-       double xRot = (x * Math.cos(RobotHeading) - (y * Math.sin(RobotHeading)));
-       double yRot = (x * Math.cos(RobotHeading) + (y * Math.sin(RobotHeading)));
-
-        double frontLeftPower = (-xRot + yRot + angle);
-        double backLeftPower = (-xRot - yRot + angle);
-        double frontRightPower = (-xRot - yRot - angle);
-        double backRightPower = (-xRot + yRot - angle);
-
-        double  denominator = Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(backLeftPower), Math.max(Math.abs(frontRightPower), Math.max( Math.abs(backRightPower), 1))));
         Lfront.setPower(frontLeftPower / denominator);
         Lback.setPower(backLeftPower / denominator);
         Rfront.setPower(frontRightPower / denominator);
         Rback.setPower(backRightPower / denominator);
-
-
-
-        /*
-
-        deltaTime = (float) timer.milliseconds() - lastTime;    // get delta time
-        float deltaDistance = distance - lastDistance;          // gets the delta distance to the target Pose
-        float deltaX = Target.X - (float) RobotPositionX;        //gets the X distance to the target Pose
-        float deltaY = Target.Y - (float) RobotPositionY;        //gets the Y distance to the target Pose 
-        float robotTheta =(float) getOrientation();              //gets the robot orientation
-        float deltaThetha = Target.TargetHeading - robotTheta;   //gets the amount of degrees the robot needs to rotate to get to the target Pose
-
-        //transform the directions the robot needs to drive to robot relative values
-       float transformtDx = deltaX * (float) Math.cos( robotTheta) - deltaY *  (float) Math.sin(robotTheta); //TODO make sure that robotTheta may needs to be negative
-       float transformtDy = deltaX * (float) Math.sin(robotTheta) + deltaY * (float) Math.cos(robotTheta);
-
-       //set last distance to current distance and calculate new distance
-       lastDistance = distance;
-       distance = (float)Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-        // calculates the PID values for the scaling of the motorspeed to ensure that the robot obtains its target Pose acurately
-        P = (float)driveKp * distance;
-        I = I + (float)driveKi * deltaDistance + deltaTime;
-        D = (float)driveKd * deltaDistance / deltaTime;
-
-        // adds values to get unscaled robot values
-        //TODO add a rotation function
-         Fl = -(-transformtDy + transformtDx) * (P + I + D);  // Fl = front left
-        Bl = -(-transformtDy - transformtDx) * (P + I + D); // Bl = back left
-        Fr = -(-transformtDy - transformtDx) * (P + I + D);  // Fr = front right
-        Br = (transformtDy + transformtDx) * (P + I + D);  // Br = bakc left
-    
-       //Normalizeses the motorvalues to stay between -1 and 1 and asign them to the motors
-       float denominator = Math.max(Math.abs(Fl), Math.max(Math.abs(Bl), Math.max(Math.abs(Fr), Math.max( Math.abs(Br), 1f))));
-
-
-
-
-       Lfront.setPower(Fl);
-       Lback.setPower(Bl);
-       Rfront.setPower(Fr);
-       Rback.setPower(Br);
-
-        //gets delta time
-        lastTime = (float) timer.milliseconds();
-
-         */
-
-
-
     }
 
-    public void followPath(Node[] path, float pathAcuracy, float orientation)
+
+    public void followPath(Node[] path)
     {
 
         for(int i = 0; i < path.length; i++)
         {
-            while(distance > path[i].acuracy)   //TODO (add al conditions such as orientation and actions in between points) drive to point until conditionts met to go to the next point
+            while(distance > path[i].accuracy)   //TODO (add al conditions such as orientation and actions in between points) drive to point until conditions met to go to the next point
             {
 
                 if(path[i].HasCondition == true)
@@ -230,6 +191,15 @@ public class Drivetrain extends Robot {
         }
 
     }
+
+    public void Stop()
+    {
+        Lfront.setPower(0);
+        Lback.setPower(0);
+        Rfront.setPower(0);
+        Rback.setPower(0);
+    }
+
 
     @Override
     public void Init() { //TODO make a init function, robot calib etc

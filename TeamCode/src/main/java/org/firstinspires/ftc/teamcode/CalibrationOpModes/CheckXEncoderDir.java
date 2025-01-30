@@ -21,7 +21,8 @@ public class CheckXEncoderDir extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.addData("Status", "Running");
             telemetry.addData("X1 direction: ", lback.getCurrentPosition());
-            telemetry.addData("X1 direction: ", rfront.getCurrentPosition());
+            telemetry.addData("X2 direction: ", rfront.getCurrentPosition());
+            telemetry.update();
         }
 
     }

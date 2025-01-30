@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.classes.robotHardware;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Hardware {
 
@@ -22,10 +24,12 @@ public class Hardware {
     public static Servo klauwServoRechts;
 
     public static Servo HorizontalSlider;
+    public static Servo Arm;
 
     // create sensors
     public static IMU imu;
     public static Encoder X1, X2, Y;
+    public static TouchSensor liftLimit;
     // Additional variables
 
     public  Hardware()
@@ -49,11 +53,14 @@ public class Hardware {
         klauwServoLinks = hwmap.get(Servo.class, "KlauwServoLinks"); //expansionhub port 0
         klauwServoRechts = hwmap.get(Servo.class, "KlauwServoRechts" ); //expansionhub port 1
         HorizontalSlider = hwmap.get(Servo.class, "HorizontalSlider");
+        Arm = hwmap.get(Servo.class, "Arm");
 
         //connect sensors
         X1 = new Encoder(lback, Encoder.Direction.REVERSE);
         X2 = new Encoder(rfront, Encoder.Direction.FORWARD);
         Y = new Encoder(lfront, Encoder.Direction.FORWARD);
+
+        liftLimit = hwmap.get(TouchSensor.class, "LiftLimit");
 
         //imu
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;

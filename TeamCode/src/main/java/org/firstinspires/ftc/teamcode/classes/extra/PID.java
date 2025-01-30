@@ -2,181 +2,90 @@ package org.firstinspires.ftc.teamcode.classes.extra;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.lang.annotation.Target;
-import java.util.Timer;
-
-/**
- * The PID class implements a Proportional-Integral-Derivative (PID) controller.
- * It is used to calculate the control output for a system based on the error
- * between a target value andthe current value.
- */
 public class PID {
 
-    //The gains for the pid loop, kp: proportional, ki: integral, Kd: derivative
-    /**
-     * The proportional gain (Kp) of the PID controller.
-     */
-    public static double kp;
-    /**
-     * The integral gain (Ki) of the PID controller.
-     */
-    public static double ki;
-    /**
-     * The derivative gain (Kd) of the PID controller.
-     */
-    public static double kd;
+    // Gains for PID loop
+    private double kp, ki, kd;
 
-    //Target and current data,
-    /**
-     * Thetarget value for the PID controller.
-     */
-    public double targetValue;
-    /**
-     * The current value being measured.
-     */
-    public double currentval;
-    /**
-     * The time of the last update.
-     */
-    public double LastTime;
-    /**
-     * The current time.
-     */
-    public double CurrentTime;
+    // PID variables
+    private double targetValue = 0;
+    private double lastError = 0;
+    private double integral = 0;
 
-    //usefull vars
-    /**
-     * The error from the last update.
-     */
-    public double lastError;
-    /**
-     * The accumulated integral error.
-     */
-    public double i;
-
-    /**
-     * The time difference between the last update and the current update.
-     */
-    public double dt;
+    // Timing variables
+    private double lastTime = 0;
 
     /**
      * Constructor for the PID class.
      *
-     * @param kp          The proportional gain (Kp).
-     * @param ki          The integral gain (Ki).
-     * @param kd          The derivative gain (Kd).
-     * @param targetValue The initial target value.
-     * @param CurrentTime The initial current time.
+     * @param kp The proportional gain.
+     * @param ki The integral gain.
+     * @param kd The derivative gain.
      */
-    public PID(double kp, double ki, double kd, double targetValue, double CurrentTime) //Constructor to create an pid loop :)
-    {
+    public PID(double kp, double ki, double kd) {
         this.kp = kp;
         this.ki = ki;
         this.kd = kd;
-        this.targetValue = targetValue;
-        this.CurrentTime = CurrentTime;
     }
 
     /**
-     * Calculates the error between the target value and the current value.
-     *
-     * @param targetValue The target value.
-     * @param currentval  The current value.
-     * @return The error (targetValue - currentval).
+     * Resets the PID controller state.
      */
-    public double error(double targetValue, double currentval) {
-        return targetValue - currentval;
-    }
-
-
-    /**
-     * Calculates the change in error since the last update.
-     *
-     * @param t The target value.
-     * @param c The current value.
-     * @return The change in error.
-     */
-    public double deltaError(double t, double c) {
-        double dE = error(t, c) - lastError;
-        lastError = error(t, c);
-        return dE;
+    public void reset() {
+        lastError = 0;
+        integral = 0;
+        lastTime = 0;
     }
 
     /**
-     * Calculates the time difference (dt) between the current time and the last update time.
+     * Updates and calculates the PID output value.
      *
-     * @param ct The current time.
-     * @return The time difference (dt).
-     */
-    public double DeltaTime(double ct) {
-        CurrentTime = ct;
-        double dT = CurrentTime - LastTime;
-        LastTime = CurrentTime;
-
-        return dT;
-    }
-
-    /**
-     * Calculates the proportional (P) term of the PID controller.
-     *
-     * @param t The target value.
-     * @param c The current value.
-     * @return The P term.
-     */
-    public double P(double t, double c) {
-        return error(t, c) * kp;
-    }
-
-    /**
-     * Calculates the integral (I) term of the PID controller.
-     *
-     * @param t  The target value.
-     * @param c  The current value.
-     * @param ct The current time.
-     * @return The I term.
-     */
-    public double I(double t, double c, double ct) {i = i + (error(t, c) * ki * dt);
-        return i;
-    }
-
-    /**
-     * Calculates the derivative (D) term of the PID controller.
-     *
-     * @param t  The target value.
-     * @param c  The current value.
-     * @param ct The current time.
-     * @return The D term.
-     */
-    public double D(double t, double c, double ct) {
-        return (deltaError(t, c) / dt) * kd;
-    }
-
-    /**
-     * Calculates the PID output value.
-     *
-     * @param currentVal  The current value.
-     * @param targetValue The target value.
-     * @param currentTime The current time.
+     * @param currentVal  The current value being measured.
+     * @param targetVal   The target value for the PID controller.
+     * @param elapsedTime The elapsed time instance for calculating `dt`.
      * @return The PID output value.
      */
-    public double pidValue(double currentVal, double targetValue, double currentTime) {
+    public double calculate(double currentVal, double targetVal, ElapsedTime elapsedTime) {
+        double currentTime = elapsedTime.seconds();
+        double dt = currentTime - lastTime;
 
-        double p, i, d;
-        dt = DeltaTime(currentTime);
-        p = P(targetValue, currentVal);
-        i = I(targetValue, currentVal, currentTime);
-        d = D(targetValue, currentVal, currentTime);
-        double pid;
+        // Handle case where dt is too small
+        if (dt <= 0) {
+            dt = 0.01; // Small default value
+        }
 
+        double error = targetVal - currentVal;
 
-        pid = p + i + d;
+        // Proportional term
+        double proportional = kp * error;
 
+        // Integral term
+        integral += error * dt;
+        if(Math.abs(integral) > 0.333 && integral > 0)
+        { integral = 0.333;}
+        else
+        if(Math.abs(integral) > 0.333)
+        {
+            integral = -0.333;
+        }
+        double integralTerm = ki * integral;
 
-        //return P(targetValue, currentVal) ;
-        //return I(targetValue, currentVal, currentTime) ;
-        return pid;
-        //return P(targetValue, currentVal) + I(targetValue, currentVal, currentTime) + D(targetValue, currentVal, currentTime);
+        // Derivative term
+        double derivative = kd * (error - lastError) / dt;
+
+        // Save state
+        lastError = error;
+        lastTime = currentTime;
+
+        return proportional + integralTerm + derivative;
     }
 
-
+    /**
+     * Sets the target value for the PID controller.
+     *
+     * @param targetValue The target value.
+     */
+    public void setTargetValue(double targetValue) {
+        this.targetValue = targetValue;
+    }
 }

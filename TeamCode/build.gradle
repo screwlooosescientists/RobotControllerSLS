@@ -20,6 +20,8 @@ android {
 
     packagingOptions {
         jniLibs.useLegacyPackaging true
+        exclude('META-INF/INDEX.LIST')
+        exclude('META-INF/io.netty.versions.properties')
     }
 }
 

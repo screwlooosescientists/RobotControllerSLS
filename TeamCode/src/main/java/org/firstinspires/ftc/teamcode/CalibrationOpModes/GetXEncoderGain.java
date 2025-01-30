@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware;
 import static org.firstinspires.ftc.teamcode.classes.robotHardware.Hardware.*;
 
-@TeleOp(name = "Check X Encoder dir", group = "Calibration")
+@TeleOp(name = "Check X Encoder gain", group = "Calibration")
 public class GetXEncoderGain extends LinearOpMode{
 
     Hardware RobotHardware = new Hardware();
